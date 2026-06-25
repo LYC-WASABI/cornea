@@ -16,18 +16,61 @@ This Stage 200 branch is the trusted reference for:
 ## Latest experimental attempt
 
 - model:
-  - `576u2_stage576_recursive_split005_alpha020_results.mph`
+  - `576v_stage576_recursive_fine005_results.mph`
 - note:
-  - `576u2_stage576_recursive_split005_alpha020_diagnostic.md`
+  - `576v_stage576_recursive_fine005_diagnostic.md`
 - builder:
-  - `build_stage576u2_recursive_split_segment_005_alpha020.java`
+  - `build_stage576v_recursive_fine_segment_005.java`
 
 Current interpretation:
 
 - this is the newest local branch by timestamp
-- it is numerically stable
-- but `alpha = 0.20` worsened the second split segment compared with the
-  `alpha = 0.15` split case
+- it is not checked
+- it refined the early split to `0 -> 1.25% -> 2.5% -> 3.75% -> 5%`
+- segment 1 improved to `F_total = 0.0380302 N`
+- segment 2 worsened to `F_total = 0.0620923 N` and failed acceptance
+- simple segment refinement is therefore not the next main-line direction
+
+## 2026-06-25
+
+### Changed
+
+- Created Stage 576v fine-segment recursive test.
+- Kept `alpha_pfb576v = 0.15`.
+- Kept `beta_relax576v = 0.15`.
+- Changed segment endpoints from `0 -> 2.5% -> 5%` to
+  `0 -> 1.25% -> 2.5% -> 3.75% -> 5%`.
+
+### Observed
+
+- Segment 1, `0 -> 1.25%`, converged with `F_contact = 0.0280043 N`,
+  `F_film = 0.0100258 N`, and `F_total = 0.0380302 N`.
+- Segment 2, `1.25% -> 2.5%`, ended with `F_contact = 0.0262712 N`,
+  `F_film = 0.0358211 N`, and `F_total = 0.0620923 N`.
+- Segment 2 failed acceptance before the run advanced to `3.75%` or `5%`.
+- Pressure/cavitation remained finite: `MaxP = 56.99 kPa`,
+  `MinTheta = 0.9999710`, and `MinGap = -57.22 um` at the failed segment.
+
+### Interpretation
+
+- Finer `1.25%` segmentation improves the very first segment but worsens the
+  next pressure-history handoff.
+- The remaining issue is not gross numerical instability, mask direction, or
+  exterior pressure anchoring.
+- `alpha`, `beta`, and segment size alone have not closed
+  `F_contact + F_film` to the `0.03 N` target.
+
+### Next Step
+
+- Return to the `576u` two-segment baseline.
+- Test explicit load-control/release on the imposed indentation instead of
+  continuing to tune `alpha`, `beta`, or segment size alone.
+
+### Files
+
+- `build_stage576v_recursive_fine_segment_005.java`
+- `576v_stage576_recursive_fine005_diagnostic.md`
+- `576v_stage576_recursive_fine005_results.mph`
 
 ## Latest validated checked milestone
 
