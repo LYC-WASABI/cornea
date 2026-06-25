@@ -50,3 +50,48 @@ When discussing "the latest model", always clarify whether the meaning is:
 
 1. latest experimental attempt by timestamp, or
 2. latest explicitly verified checked result
+
+## Update Log Template
+
+Use the following template for each new modeling session. Add the newest entry
+at the top of the log.
+
+```md
+## YYYY-MM-DD
+
+### Changed
+
+- what geometry, physics, solver, variable, boundary, or script was changed
+- what file names were updated
+
+### Observed
+
+- what happened after the change
+- include concrete quantities when available
+- examples: `F_contact`, `F_film`, `F_total`, `theta`, `max pressure`, `min gap`
+
+### Interpretation
+
+- what the change appears to mean physically or numerically
+- whether the result is better, worse, inconclusive, or only partially useful
+
+### Next Step
+
+- the single most defensible next action
+- if needed, list a fallback action after that
+
+### Files
+
+- `note.md`
+- `build_or_probe.java`
+- `result_or_checkpoint.mph`
+```
+
+## Recommended Logging Rules
+
+- Record only one coherent modeling step per dated block.
+- Prefer measured quantities over narrative impressions.
+- If a result is not validated, say so explicitly.
+- If a branch becomes a dead end, mark that clearly so later sessions do not
+  mistake it for the preferred path.
+- When possible, name both the note file and the matching Java script.
