@@ -1,0 +1,31 @@
+import com.comsol.model.*;
+import com.comsol.model.util.*;
+
+public class du_flow_lid8_stage22_disconnect_reconnect_transient_run {
+  private static final String IN =
+      "D:\\COMSOL_Outputs\\models\\du\\flow\\76_lid8mm_stage23_pure_inner_persistent_transient_setup.mph";
+  private static final String OUT =
+      "D:\\COMSOL_Outputs\\models\\du\\flow\\77_lid8mm_stage23_pure_inner_persistent_transient_results.mph";
+
+  public static void main(String[] args) throws Exception {
+    ModelUtil.initStandalone(true);
+    Model model = ModelUtil.load("Model", IN);
+    model.label("77_lid8mm_stage23_pure_inner_persistent_transient_results.mph");
+    try {
+      model.component("comp1").physics("solid").feature("dcnt1").feature().remove("fric_partitioned_stabilizer");
+    } catch (Exception ignored) {}
+    model.component("comp1").physics("solid").feature("dcnt1").feature()
+        .create("fric_partitioned_stabilizer", "Friction");
+    model.component("comp1").physics("solid").feature("dcnt1")
+        .feature("fric_partitioned_stabilizer")
+        .label("Numerical tangential stabilizer only - excluded from reported friction");
+    model.component("comp1").physics("solid").feature("dcnt1")
+        .feature("fric_partitioned_stabilizer").set("mu_fric", "0.1");
+    model.study("std_partitioned_local_pfilm").feature("time").set("tlist",
+        "range(0,dt_structure_out,T_structure_pre+T_structure_slide+T_structure_hold)");
+    System.out.println("RUN_STAGE23_TRANSIENT_FULL");
+    model.study("std_partitioned_local_pfilm").run();
+    model.save(OUT);
+    System.out.println("SAVED_STAGE23_TRANSIENT_RESULTS=" + OUT);
+  }
+}

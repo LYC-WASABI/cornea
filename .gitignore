@@ -1,0 +1,16 @@
+# COMSOL model binaries and transient artifacts
+*.mph
+*.mph.bin
+*.mph.lock
+
+# Java build outputs
+*.class
+
+# Run logs and status markers
+*.log
+*.status
+
+# Common local/system noise
+Thumbs.db
+Desktop.ini
+*.tmp
