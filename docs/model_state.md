@@ -15,21 +15,72 @@ This Stage 200 branch is the trusted reference for:
 
 ## Latest experimental attempt
 
+## Latest experimental attempt
+
 - model:
-  - `576v_stage576_recursive_fine005_results.mph`
+  - `576w3c_stage576_recursive_split005_film_height_release_extended_checked.mph`
 - note:
-  - `576v_stage576_recursive_fine005_diagnostic.md`
+  - `576w3c_stage576_recursive_split005_film_height_release_extended_diagnostic.md`
 - builder:
-  - `build_stage576v_recursive_fine_segment_005.java`
+  - `build_stage576w3c_recursive_split005_film_height_release_extended.java`
 
 Current interpretation:
 
-- this is the newest local branch by timestamp
-- it is not checked
-- it refined the early split to `0 -> 1.25% -> 2.5% -> 3.75% -> 5%`
-- segment 1 improved to `F_total = 0.0380302 N`
-- segment 2 worsened to `F_total = 0.0620923 N` and failed acceptance
-- simple segment refinement is therefore not the next main-line direction
+- this is the newest Stage 576 checked result
+- it passed both early split segments: `0 -> 2.5%` and `2.5% -> 5%`
+- it introduced explicit imposed-indentation release plus film-height release:
+  `h_calc576w3c = h_calc573 + drel576w3c`
+- segment 1 closed to `F_total = 0.0328395 N`
+- segment 2 closed to `F_total = 0.0329548 N`
+- both are within the acceptance window around the `0.03 N` target
+
+## 2026-06-25-22.42
+
+### Changed
+
+- Created Stage 576w3c film-height release extended test.
+- Kept the 576u split route:
+  `segments = 0 -> 2.5% -> 5%`.
+- Kept `alpha = 0.15` and `beta = 0.15`.
+- Added explicit imposed-indentation release and explicit TFF film-height release:
+  `h_calc576w3c = h_calc573 + drel576w3c`.
+- Increased inner iterations to 32.
+- Used `gamma = 0.12`, `Keff = 5000 N/m`,
+  `drel_step_max = 0.5 um`, and `drel_max = 40 um`.
+
+### Observed
+
+- Segment 1, `0 -> 2.5%`, passed:
+  `F_contact = 0.0221469 N`,
+  `F_film = 0.0106927 N`,
+  `F_total = 0.0328395 N`,
+  `drel = 4.4197 um`.
+- Segment 2, `2.5% -> 5%`, passed:
+  `F_contact = 0.0196748 N`,
+  `F_film = 0.0132800 N`,
+  `F_total = 0.0329548 N`,
+  `drel = 4.9723 um`.
+- `CHECKED_STATUS=PASS`.
+
+### Interpretation
+
+- Stage 576w3c is the first Stage 576 branch that closed both early split segments to the `0.03 N` target range using explicit load release.
+- The earlier 576w and 576w2 branches showed that releasing only the solid indentation was insufficient because the film load did not decrease.
+- The successful change was adding the release displacement directly into the TFF film height:
+  `h_calc576w3c = h_calc573 + drel576w3c`.
+
+### Next Step
+
+- Do not continue tuning `alpha`, `beta`, `segment size`, or release gain immediately.
+- Treat 576w3c as the current checked milestone.
+- Create and run `verify_stage576w3c_checked.java` to independently verify the checked `.mph` result.
+
+### Files
+
+- `576w3c_stage576_recursive_split005_film_height_release_extended_checked.mph`
+- `576w3c_stage576_recursive_split005_film_height_release_extended_results.mph`
+- `576w3c_stage576_recursive_split005_film_height_release_extended_diagnostic.md`
+- `build_stage576w3c_recursive_split005_film_height_release_extended.java`
 
 ## 2026-06-25
 
