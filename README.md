@@ -2,6 +2,17 @@
 
 This repository tracks the reproducible source artifacts for the cornea-lid mixed lubrication and contact modeling work in this workspace.
 
+## Project entry points
+
+For human or model-assisted reading, start with:
+
+- `CONTEXT.md`
+- `LATEST_MODEL.md`
+- `AGENTS.md`
+- `docs/project_overview.md`
+- `docs/model_state.md`
+- `docs/next_tasks.md`
+
 ## Included
 
 - COMSOL Java build and validation scripts (`*.java`)
