@@ -15,24 +15,205 @@ This Stage 200 branch is the trusted reference for:
 
 ## Latest experimental attempt
 
-## Latest experimental attempt
+- model:
+  - `577h2_stage577_asperity_calibration_refined_results.mph`
+- note:
+  - `577h2_stage577_asperity_calibration_refined_diagnostic.md`
+- builder:
+  - `build_stage577h2_asperity_calibration_refined.java`
+
+Current interpretation:
+
+- this is the newest Stage 577 checked postprocessing diagnostic
+- it preserves `576w3c` as the input baseline but does not overwrite it
+- `577a` passed the local TFF check with conserved `3 um` film thickness
+- `577b` passed low-film / rupture activation as a postprocessing diagnostic
+- `577c` passed mixed-lubrication / boundary-friction postprocessing
+- `577d` is a useful failed sensitivity diagnostic because `mu_total` did not increase monotonically with `dh_deplete`
+- `577e` failed because direct depleted film height in `ffp1.hw1` was too slow
+- `577f` passed load-sharing boundary-pressure postprocessing
+- `577g` passed the asperity-pressure proxy path; direct `solid.Tn` was reported but not accepted
+- `577h` first small asperity-calibration scan failed; it is the latest attempt but not a checked milestone
+- `577h2` refined asperity-calibration scan passed and is the latest checked postprocessing calibration result
+- it outputs effective `mu_total` diagnostics, but it is not yet a fully coupled solid-contact-TFF result
+
+Latest trusted structural/TFF load-balance baseline:
 
 - model:
   - `576w3c_stage576_recursive_split005_film_height_release_extended_checked.mph`
 - note:
   - `576w3c_stage576_recursive_split005_film_height_release_extended_diagnostic.md`
-- builder:
-  - `build_stage576w3c_recursive_split005_film_height_release_extended.java`
+- verifier:
+  - `verify_stage576w3c_checked.java`
 
-Current interpretation:
+This remains the newest checked early-stroke split load-balance result.
 
-- this is the newest Stage 576 checked result
-- it passed both early split segments: `0 -> 2.5%` and `2.5% -> 5%`
-- it introduced explicit imposed-indentation release plus film-height release:
-  `h_calc576w3c = h_calc573 + drel576w3c`
-- segment 1 closed to `F_total = 0.0328395 N`
-- segment 2 closed to `F_total = 0.0329548 N`
-- both are within the acceptance window around the `0.03 N` target
+## 2026-06-26
+
+### Changed
+
+- Created Stage 577a conserved `3 um` local TFF check from `576w3c`.
+- Created Stage 577b low-film / rupture activation diagnostic from 577a.
+- Created Stage 577c mixed-lubrication / boundary-friction postprocess from 577b.
+- Kept all changes in new files; `576w3c` was not overwritten.
+
+### Observed
+
+- `577a` passed with `h_avg = 3.000e-6 m`, finite pressure/theta, and signed shear reversal.
+- `577b` passed with `h_avg = 2.936e-6 to 3.098e-6 m` for the strongest `dh_deplete = 2.8 um` branch.
+- `577b` depletion scan showed increasing low-film activation from `dh_deplete = 0.5` to `2.8 um`.
+- `577c` passed with boundary friction sign reversal and monotonic `mu_total`.
+- `577c` maximum `mu_total` values:
+  `0.010095`, `0.023418`, `0.045622`, and `0.090030`
+  for `mu_boundary = 0.02`, `0.05`, `0.10`, and `0.20`.
+
+### Interpretation
+
+- Pure-fluid `mu_TFF_alt` remains small, with maximum `0.0020777`, as expected.
+- The Stage 577 mixed-lubrication postprocess raises the effective coefficient into the desired diagnostic range without retuning TFF pressure.
+- The current limitation is that `577b` and `577c` are postprocessing checks; depleted film height and boundary friction are not yet coupled back into the governing solve.
+
+### Next Step
+
+- Preserve 577a/577b/577c as checked diagnostics.
+- Next decide whether to calibrate `mu_boundary577c` against a target experimental COF, or to implement a weakly coupled version where low-film activation affects the TFF solve.
+
+### Files
+
+- `build_stage577a_conserved_3um_local_tff_check.java`
+- `build_stage577b_conserved_depletion_rupture_check.java`
+- `build_stage577c_mixed_lubrication_boundary_friction.java`
+- `577a_stage577_conserved_3um_local_tff_check_diagnostic.md`
+- `577b_stage577_conserved_depletion_rupture_check_diagnostic.md`
+- `577c_stage577_mixed_lubrication_boundary_friction_diagnostic.md`
+- `577a_stage577_conserved_3um_local_tff_check_results.mph`
+- `577b_stage577_conserved_depletion_rupture_check_results.mph`
+- `577c_stage577_mixed_lubrication_boundary_friction_results.mph`
+
+## 2026-06-27
+
+### Changed
+
+- Created Stage 577d postprocess calibration and sensitivity scan.
+- Created Stage 577e weakly coupled depleted TFF attempt.
+- Created Stage 577f load-sharing boundary-pressure postprocess.
+- Created Stage 577g contact-pressure / asperity-pressure boundary model.
+
+### Observed
+
+- `577d` found target-COF candidates for `dh_deplete >= 2.0 um`, but failed the monotonic-with-`dh_deplete` criterion.
+- `577e` was manually terminated twice because the depleted-height TFF solve became impractically slow in the early transient.
+- `577f` passed with `Fn_boundary = max(Fn_ref - Fn_fluid_pos, 0)` and `mu_total` about `0.089-0.090` at `mu_boundary = 0.20`.
+- `577g` found that `solid.Tn` is available but not useful for dynamic friction in the current TFF dataset; the asperity proxy passed with `mu_total max = 0.116789`.
+
+### Interpretation
+
+- `577d` confirms that `p_boundary = Fn_ref/A_close` can flatten or slightly reverse the `dh_deplete` trend because increasing low-film area lowers pressure.
+- `577e` shows that directly inserting spatially depleted film height into `ffp1.hw1` is not yet practical without continuation, smoothing, or shorter micro-window testing.
+- `577f` is the preferred load-sharing postprocess branch.
+- `577g` is the preferred roughness/asperity proxy branch; do not use direct `solid.Tn` from the current dataset as final boundary pressure.
+
+### Next Step
+
+- Do not continue with direct full-cycle 577e as written.
+- Next either tune the 577g asperity proxy parameters, or create a short-window/continuation 577e2 weak-coupling attempt.
+
+### Files
+
+- `build_stage577d_postprocess_calibration_sensitivity.java`
+- `build_stage577e_weakly_coupled_depleted_tff.java`
+- `build_stage577f_load_sharing_boundary_pressure.java`
+- `build_stage577g_contact_or_asperity_boundary_model.java`
+- `577d_stage577_postprocess_calibration_sensitivity_diagnostic.md`
+- `577e_stage577_weakly_coupled_depleted_tff_diagnostic.md`
+- `577f_stage577_load_sharing_boundary_pressure_diagnostic.md`
+- `577g_stage577_contact_or_asperity_boundary_model_diagnostic.md`
+- `577d_stage577_postprocess_calibration_sensitivity_results.mph`
+- `577f_stage577_load_sharing_boundary_pressure_results.mph`
+- `577g_stage577_contact_or_asperity_boundary_model_results.mph`
+
+## 2026-06-27-577h
+
+### Changed
+
+- Created Stage 577h first small asperity-calibration scan.
+- Used `K_asp_eff` in kPa and scanned 24 postprocessing parameter combinations.
+- Did not re-solve TFF and did not use direct `solid.Tn`.
+
+### Observed
+
+- All 24 combinations were finite.
+- `mu_total` increased monotonically with `mu_boundary`.
+- `mu_total` increased monotonically with `K_asp_eff`.
+- No combination passed all filters.
+- `h_crit = 0.5 um` did not activate asperity pressure in the tested window.
+- The closest useful case was `dh=2.5 um`, `h_crit=1.0 um`, `K_asp_eff=30 kPa`, `mu_boundary=0.05`, with `mu_total_max=0.08847`, but `Fn_asp/Fn_ref_max=4.02`.
+
+### Interpretation
+
+- The first 577h window brackets the problem: low `h_crit` is underactive, while `h_crit=1.0 um` plus current `K_asp_eff` overproduces asperity normal load.
+- The next scan should lower `K_asp_eff` and add intermediate `h_crit` values.
+
+### Next Step
+
+- Create `577h2` adjusted small scan:
+  `dh_deplete = 2.3, 2.5, 2.8 um`,
+  `h_crit = 0.7, 0.8, 0.9, 1.0 um`,
+  `K_asp_eff = 5, 10, 20, 30 kPa`,
+  `mu_boundary = 0.05, 0.10, 0.15`.
+
+### Files
+
+- `build_stage577h_asperity_calibration.java`
+- `577h_stage577_asperity_calibration_diagnostic.md`
+- `577h_stage577_asperity_calibration_summary.csv`
+- `577h_stage577_asperity_calibration_best_params.md`
+- `577h_stage577_asperity_calibration_results.mph`
+
+## 2026-06-27-577h2
+
+### Changed
+
+- Created Stage 577h2 refined asperity-calibration scan.
+- Reduced `K_asp_eff` and increased `mu_boundary` to preserve friction scale while reducing asperity normal-load proxy.
+- Added `PARAM_SCORE` and `PASS_LEVEL` to the calibration CSV.
+
+### Observed
+
+- `SCAN_COUNT = 180`.
+- `STRONG_PASS_COUNT = 53`.
+- `CANDIDATE_PASS_COUNT = 15`.
+- All values were finite.
+- `mu_total` remained monotonic with `mu_boundary`.
+- `mu_total` remained monotonic with `K_asp_eff`.
+- Best candidate:
+  `dh_deplete = 2.5 um`,
+  `h_crit = 1.0 um`,
+  `K_asp_eff = 7.5 kPa`,
+  `mu_boundary = 0.20`,
+  `mu_total_max = 0.0884728`,
+  `A_close/A_film_mean = 0.0739728`,
+  `Fn_asp/Fn_ref_max = 1.00473`.
+
+### Interpretation
+
+- Stage 577h2 fixed the main Stage 577h failure mode.
+- The preferred candidate keeps the target friction scale while reducing the asperity normal-load proxy from about `4.02*Fn_ref` to about `1.00*Fn_ref`.
+- This is still a postprocessing calibration, not a fully coupled mixed-lubrication solve.
+
+### Next Step
+
+- Create Stage 577i using the selected fixed parameter set.
+- Output paper-facing time curves and spatial plots:
+  `mu_TFF_alt(t)`, `mu_total(t)`, `Ft_fluid(t)`, `Ft_asp(t)`, `A_close(t)`, `Fn_asp(t)`, `theta_min(t)`, `pfilm_max(t)`, `h_eff_min(t)`, plus spatial fields for `h_eff`, `theta`, `pfilm`, `w_close`, and `p_asp`.
+
+### Files
+
+- `build_stage577h2_asperity_calibration_refined.java`
+- `577h2_stage577_asperity_calibration_refined_diagnostic.md`
+- `577h2_stage577_asperity_calibration_refined_summary.csv`
+- `577h2_stage577_asperity_calibration_refined_best_params.md`
+- `577h2_stage577_asperity_calibration_refined_results.mph`
 
 ## 2026-06-25-22.42
 
@@ -123,7 +304,7 @@ Current interpretation:
 - `576v_stage576_recursive_fine005_diagnostic.md`
 - `576v_stage576_recursive_fine005_results.mph`
 
-## Latest validated checked milestone
+## Latest full-path validated checked milestone
 
 - model:
   - `576n12_stage576_full_dynamic_recursive_checked.mph`
@@ -134,9 +315,11 @@ Current interpretation:
 
 Current interpretation:
 
-- this is the newest clearly checked and verified Stage 576 result
+- this is the older clearly checked and verified full-path Stage 576 result
 - it reached fraction `1.0000`
 - it passed the acceptance checks recorded in the note
+- it remains the full-path reference, while `576w3c` is the newest verified
+  early-stroke split milestone
 
 ## Working rule
 
